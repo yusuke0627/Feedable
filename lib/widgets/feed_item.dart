@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../screens/feedView.dart';
 
@@ -6,11 +7,14 @@ class FeedItem extends StatelessWidget {
   String title;
   String siteName;
   String url;
-  FeedItem(this.title, this.siteName, this.url);
+  DateTime publishedDate;
+
+  FeedItem(this.title, this.siteName, this.url, this.publishedDate);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
+      padding: EdgeInsets.only(top: 5, bottom: 5),
       child: ListTile(
           onTap: () => {
                 Navigator.push(
@@ -18,19 +22,31 @@ class FeedItem extends StatelessWidget {
                     MaterialPageRoute(
                         builder: (BuildContext _context) => FeedView(url: url)))
               },
-          title: Row(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                   height: 40.0,
-                  width: 250.0,
-                  color: Colors.amberAccent,
-                  child: Text(title)),
+                  child: Text(
+                    title,
+                    style: TextStyle(fontSize: 14),
+                  )),
               Container(
-                  height: 40.0,
-                  width: 100.0,
-                  color: Colors.amber,
-                  alignment: Alignment.bottomRight,
-                  child: Text(siteName, style: TextStyle(fontSize: 10.0)))
+                  height: 20.0,
+                  alignment: Alignment.bottomLeft,
+                  child: Row(
+                    children: [
+                      Text(siteName, style: TextStyle(fontSize: 10.0)),
+                      SizedBox(
+                        width: 10.0,
+                      ),
+                      Text(
+                        new DateFormat('yyyy/MM/dd(E) HH:mm')
+                            .format(publishedDate),
+                        style: TextStyle(fontSize: 10.0),
+                      )
+                    ],
+                  )),
             ],
           )),
     );

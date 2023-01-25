@@ -20,7 +20,7 @@ Future<List<Feed>> getFeed(String url, FeedType type) async {
           (item) => Feed(
             url: item.link ?? '',
             title: item.title ?? '',
-            date: item.pubDate ?? DateTime.now(),
+            publishedDate: item.pubDate ?? DateTime.now(),
             blogName: rssFeed.title ?? '',
           ),
         )
@@ -34,7 +34,7 @@ Future<List<Feed>> getFeed(String url, FeedType type) async {
           (item) => Feed(
             url: item.links?.first.href ?? '',
             title: item.title ?? '',
-            date: item.updated ?? DateTime.now(),
+            publishedDate: item.updated ?? DateTime.now(),
             blogName: atomFeed.title ?? '',
           ),
         )

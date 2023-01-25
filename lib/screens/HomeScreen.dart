@@ -36,11 +36,14 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 SlidableAction(
                   onPressed: (_) {},
-                  label: 'Later',
+                  backgroundColor: Theme.of(context).primaryColor,
+                  icon: Icons.bookmark,
+                  label: 'Bookmark',
                 )
               ],
             ),
-            child: FeedItem(feeds[i].title, feeds[i].blogName, feeds[i].url)),
+            child: FeedItem(feeds[i].title, feeds[i].blogName, feeds[i].url,
+                feeds[i].publishedDate!)),
         itemCount: feeds.length,
       ),
     );
