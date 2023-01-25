@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class FeedView extends StatefulWidget {
   final String url;
@@ -7,6 +8,17 @@ class FeedView extends StatefulWidget {
 
   @override
   State<FeedView> createState() => _FeedViewState(url: url);
+}
+
+class ViewWidget {
+  final String url;
+  ViewWidget({required this.url});
+
+  InAppWebView createWidget() {
+    return InAppWebView(
+      initialUrlRequest: URLRequest(url: Uri.parse(url)),
+    );
+  }
 }
 
 class _FeedViewState extends State<FeedView> {
@@ -32,6 +44,6 @@ class _FeedViewState extends State<FeedView> {
 
   @override
   Widget build(BuildContext context) {
-    return (WebViewWidget(controller: controller..loadRequest(Uri.parse(url))));
+    return ViewWidget(url: url).createWidget();
   }
 }

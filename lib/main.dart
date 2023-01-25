@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:feedable/screens/HomeScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
