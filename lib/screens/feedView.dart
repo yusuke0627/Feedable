@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
+import '../data/data.dart';
 
 class FeedView extends StatefulWidget {
   final String url;
@@ -9,29 +11,49 @@ class FeedView extends StatefulWidget {
   State<FeedView> createState() => _FeedViewState(url: url);
 }
 
+class ViewWidget {
+  final String url;
+  ViewWidget({required this.url});
+
+  InAppWebViewController? webViewController;
+  final List<ContentBlocker> contentBlockers = [];
+
+  InAppWebView createWidget() {
+    // for each Ad URL filter, add a Content Blocker to block its loading.
+    for (final adUrlFilter in adUrlFilters) {
+      contentBlockers.add(ContentBlocker(
+          trigger: ContentBlockerTrigger(
+            urlFilter: adUrlFilter,
+          ),
+          action: ContentBlockerAction(
+            type: ContentBlockerActionType.BLOCK,
+          )));
+    }
+    // apply the "display: none" style to some HTML elements
+    contentBlockers.add(ContentBlocker(
+        trigger: ContentBlockerTrigger(
+          urlFilter: ".*",
+        ),
+        action: ContentBlockerAction(
+            type: ContentBlockerActionType.CSS_DISPLAY_NONE,
+            selector: ".banner, .banners, .ads, .ad, .advert")));
+
+    webViewController?.setSettings(
+        settings: InAppWebViewSettings(contentBlockers: contentBlockers));
+    return InAppWebView(
+      initialSettings: InAppWebViewSettings(contentBlockers: contentBlockers),
+      initialUrlRequest: URLRequest(url: WebUri(url)),
+      onWebViewCreated: (controller) => webViewController = controller,
+    );
+  }
+}
+
 class _FeedViewState extends State<FeedView> {
   final String url;
   _FeedViewState({required this.url});
 
-  final controller = WebViewController()
-    ..setJavaScriptMode(JavaScriptMode.unrestricted)
-    // ..setBackgroundColor(const Color(0x00000000))
-    ..setNavigationDelegate(
-      NavigationDelegate(
-        onProgress: (int progress) {
-          // Update loading bar.
-        },
-        onPageStarted: (String url) {},
-        onPageFinished: (String url) {},
-        onWebResourceError: (WebResourceError error) {},
-        onNavigationRequest: (NavigationRequest request) {
-          return NavigationDecision.navigate;
-        },
-      ),
-    );
-
   @override
   Widget build(BuildContext context) {
-    return (WebViewWidget(controller: controller..loadRequest(Uri.parse(url))));
+    return ViewWidget(url: url).createWidget();
   }
 }

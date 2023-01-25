@@ -2,6 +2,8 @@ import 'package:feedable/screens/HomeScreen.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // await InAppWebViewController.setWebContentsDebuggingEnabled(true);
   runApp(const MyApp());
 }
 
