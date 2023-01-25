@@ -18,10 +18,9 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchFeed();
   }
   void fetchFeed() async {
-    await getFeed("http://alfalfalfa.com/index.rdf", FeedType.rss)
-        .then((value) => setState(() {
-              feeds = value;
-            }));
+    await getFeed().then((value) => setState(() {
+          feeds = value;
+        }));
   }
 
   @override
