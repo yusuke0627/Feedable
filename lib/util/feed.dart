@@ -2,12 +2,34 @@ import 'package:http/http.dart' as http;
 import 'package:webfeed_plus/webfeed_plus.dart';
 import 'package:feedable/models/feed.dart';
 
+import '../data/data.dart';
+
 enum FeedType {
   rss,
   atom,
 }
 
-Future<List<Feed>> getFeed(String url, FeedType type) async {
+Future<List<Feed>> getFeed() async {
+  List<List<Feed>> feedsEachSite = [];
+  await Future.forEach(Sites, (site) async {
+    FeedType? feedType;
+    if (site["feedType"]! == "rss") {
+      feedType = FeedType.rss;
+    } else if (site["feedType"]! == "atom") {
+      feedType = FeedType.atom;
+      // Cannot reach this statement.
+    } else {
+      feedType = null;
+    }
+    await _getFeedFromSite(site["url"]!, feedType!).then((value) {
+      feedsEachSite.add(value);
+    });
+  });
+
+  return feedsEachSite.expand((element) => element).toList();
+}
+
+Future<List<Feed>> _getFeedFromSite(String url, FeedType type) async {
   final response = await http.get(Uri.parse(url));
   if (response.statusCode != 200) {
     throw Exception('Failed to getFeed');
