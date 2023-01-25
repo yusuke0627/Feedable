@@ -1,4 +1,42 @@
 List<Map<String, String>> Sites = [
   {"url": "http://blog.livedoor.jp/nwknews/index.rdf", "feedType": "rss"},
-  {"url": "http://alfalfalfa.com/index.rdf", "feedType": "rss"}
+  {"url": "http://alfalfalfa.com/index.rdf", "feedType": "rss"},
+  {"url": "http://blog.livedoor.jp/news4vip2/index.rdf", "feedType": "rss"},
+  {"url": "http://blog.livedoor.jp/kinisoku/index.rdf", "feedType": "rss"},
+  {"url": "http://blog.livedoor.jp/news23vip/index.rdf", "feedType": "rss"},
+  {"url": "http://orusoku.com/index.rdf", "feedType": "rss"},
+  {"url": "http://imihu.net/index.rdf", "feedType": "rss"},
+  {"url": "http://blog.livedoor.jp/goldennews/index.rdf", "feedType": "rss"},
+];
+
+// Add advertisement url.
+List<String> adUrlFilters = [
+  ".*.doubleclick.net/.*",
+  ".*.ads.pubmatic.com/.*",
+  ".*.googlesyndication.com/.*",
+  ".*.google-analytics.com/.*",
+  ".*.adservice.google.*/.*",
+  ".*.adbrite.com/.*",
+  ".*.exponential.com/.*",
+  ".*.quantserve.com/.*",
+  ".*.scorecardresearch.com/.*",
+  ".*.zedo.com/.*",
+  ".*.adsafeprotected.com/.*",
+  ".*.teads.tv/.*",
+  ".*.outbrain.com/.*",
+  ".*.safeframe.googlesyndication.com/.*",
+  ".*ad.ad-stir.com/.*",
+  ".*adntokyo.gunosy.com/.*",
+  ".*aladdin.genieesspv.jp/.*",
+  ".*blogroll.livedoor.net/.*",
+  ".*cdn-guile.akamaized.net/.*",
+  ".*d.line-scdn.net/.*",
+  ".*ipcheck.blogsys.jp/.*",
+  ".*js.ad-stir.com/.*",
+  ".*pdn.adingo.jp/.*",
+  ".*securepubads.g.doubleclick.net/.*",
+  ".*syndication.twitter.com/.*",
+  ".*www.facebook.com/.*",
+  ".*www.googletagmanager.com/.*",
+  ".*googlesyndication.com/.*"
 ];
