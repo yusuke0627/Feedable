@@ -42,7 +42,7 @@ Future<List<Feed>> _getFeedFromSite(String url, FeedType type) async {
           (item) => Feed(
             url: item.link ?? '',
             title: item.title ?? '',
-            publishedDate: item.pubDate ?? DateTime.now(),
+            publishedDate: item.dc!.date!,
             blogName: rssFeed.title ?? '',
           ),
         )
