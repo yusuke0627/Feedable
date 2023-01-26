@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await getFeed().then((value) => setState(() {
           feeds = value;
           // sort by published date.
-          feeds.sort((a, b) => a.publishedDate!.compareTo(b.publishedDate!));
+          feeds.sort((a, b) => b.publishedDate!.compareTo(a.publishedDate!));
         }));
   }
 
