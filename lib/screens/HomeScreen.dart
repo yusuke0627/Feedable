@@ -14,6 +14,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Feed> feeds = [];
+  static const _screens = [];
+
   _HomeScreenState() {
     fetchFeed();
   }
