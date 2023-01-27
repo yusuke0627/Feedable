@@ -49,7 +49,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.favorite), label: 'Bookmark'),
+                icon: Icon(Icons.bookmark), label: 'Bookmark'),
           ],
           type: BottomNavigationBarType.fixed,
         ));
