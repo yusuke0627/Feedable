@@ -35,7 +35,9 @@ class _FeedListState extends State<FeedList> {
                       }
                     });
                   },
-                  backgroundColor: Theme.of(context).primaryColor,
+                  backgroundColor: widget.feeds[i].bookmarked
+                      ? Colors.grey
+                      : Theme.of(context).primaryColor,
                   icon: Icons.bookmark,
                   label: 'Bookmark',
                 )
