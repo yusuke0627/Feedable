@@ -1,5 +1,5 @@
 import 'package:feedable/screens/HomeScreen.dart';
-import 'package:feedable/screens/bookmarkView.dart';
+import 'package:feedable/screens/bookmarkScreen.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
