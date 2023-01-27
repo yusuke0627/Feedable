@@ -1,6 +1,6 @@
-import 'package:feedable/util/feed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/feed.dart';
 import '../widgets/feed_item.dart';
@@ -14,17 +14,24 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Feed> feeds = [];
-  static const _screens = [];
 
   _HomeScreenState() {
-    fetchFeed();
+    loadFeeds();
   }
-  void fetchFeed() async {
-    await getFeed().then((value) => setState(() {
+
+  void loadFeeds() async {
+    await Feed.getFeeds().then((value) => setState(() {
           feeds = value;
-          // sort by published date.
-          feeds.sort((a, b) => b.publishedDate!.compareTo(a.publishedDate!));
         }));
+
+    // save feeds to SharedPreferences.
+    Feed.saveFeeds(feeds);
+  }
+
+  Future<void> saveFeeds(feeds) async {
+    final prefs = await SharedPreferences.getInstance();
+    // update SharedPreferences.
+    prefs.setString("feeds", Feed.encode(feeds));
   }
 
   @override
@@ -42,8 +49,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     setState(() {
                       if (feeds[i].bookmarked) {
                         feeds[i].bookmarked = false;
+                        saveFeeds(feeds);
                       } else {
                         feeds[i].bookmarked = true;
+                        saveFeeds(feeds);
                       }
                     });
                   },
