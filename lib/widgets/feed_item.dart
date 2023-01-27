@@ -8,8 +8,10 @@ class FeedItem extends StatelessWidget {
   String siteName;
   String url;
   DateTime publishedDate;
+  bool bookmarked;
 
-  FeedItem(this.title, this.siteName, this.url, this.publishedDate);
+  FeedItem(
+      this.title, this.siteName, this.url, this.publishedDate, this.bookmarked);
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,21 @@ class FeedItem extends StatelessWidget {
                   alignment: Alignment.bottomLeft,
                   child: Row(
                     children: [
+                      bookmarked
+                          ? RichText(
+                              text: TextSpan(children: [
+                              WidgetSpan(
+                                child: Icon(
+                                  Icons.bookmark_added_outlined,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
+                            ]))
+                          : RichText(
+                              text: TextSpan(children: [
+                              WidgetSpan(
+                                  child: Icon(Icons.bookmark_add_outlined))
+                            ])),
                       Text(siteName, style: TextStyle(fontSize: 10.0)),
                       SizedBox(
                         width: 10.0,

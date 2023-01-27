@@ -36,7 +36,15 @@ class _HomeScreenState extends State<HomeScreen> {
               motion: const ScrollMotion(),
               children: [
                 SlidableAction(
-                  onPressed: (_) {},
+                  onPressed: (_) {
+                    setState(() {
+                      if (feeds[i].bookmarked) {
+                        feeds[i].bookmarked = false;
+                      } else {
+                        feeds[i].bookmarked = true;
+                      }
+                    });
+                  },
                   backgroundColor: Theme.of(context).primaryColor,
                   icon: Icons.bookmark,
                   label: 'Bookmark',
@@ -44,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             child: FeedItem(feeds[i].title, feeds[i].blogName, feeds[i].url,
-                feeds[i].publishedDate!)),
+                feeds[i].publishedDate!, feeds[i].bookmarked)),
         itemCount: feeds.length,
       ),
     );
