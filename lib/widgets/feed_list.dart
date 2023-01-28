@@ -14,6 +14,9 @@ class FeedList extends StatefulWidget {
 }
 
 class _FeedListState extends State<FeedList> {
+  _FeedListState() {
+    debugPrint("CALL: _FeedListState()");
+  }
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
