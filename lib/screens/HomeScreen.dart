@@ -17,9 +17,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> loadFeeds() async {
-    feeds = await Feed.getFeeds();
-    // save feeds to SharedPreferences.
-    Feed.saveFeeds(feeds);
+    await Feed.getFeeds().then((value) async {
+      debugPrint("CALL: loadFeeds()");
+      feeds = value;
+      // save feeds to SharedPreferences.
+      Feed.saveFeeds(feeds);
+    });
+  }
+
+  Future<void> refreshFeeds() async {
+    await Feed.getFeeds().then((value) async {
+      debugPrint("CALL: loadFeeds()");
+      // new feed found.
+      if (value.first.url != feeds.first.url) {
+        debugPrint("New feed found");
+        setState(() {
+          feeds = value;
+          // save feeds to SharedPreferences.
+          Feed.saveFeeds(feeds);
+        });
+      }
+    });
   }
 
   @override
@@ -36,12 +54,13 @@ class _HomeScreenState extends State<HomeScreen> {
               }
 
               if (snapshot.error != null) {
-                // TODO erro control
-                // return Center(child: Text('something error occur'));
+                // TODO care error.
+                return Center(child: Text('something error occur'));
               }
               ;
 
-              return FeedList(feeds);
+              return RefreshIndicator(
+                  onRefresh: refreshFeeds, child: FeedList(feeds));
             }));
   }
 }
