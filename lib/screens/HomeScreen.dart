@@ -16,11 +16,8 @@ class _HomeScreenState extends State<HomeScreen> {
     loadFeeds();
   }
 
-  void loadFeeds() async {
-    await Feed.getFeeds().then((value) => setState(() {
-          feeds = value;
-        }));
-
+  Future<void> loadFeeds() async {
+    feeds = await Feed.getFeeds();
     // save feeds to SharedPreferences.
     Feed.saveFeeds(feeds);
   }
@@ -28,6 +25,23 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('Feedable')), body: FeedList(feeds));
+        appBar: AppBar(title: Text('Feedable')),
+        body: FutureBuilder(
+            future: loadFeeds(),
+            builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              if (snapshot.error != null) {
+                // TODO erro control
+                // return Center(child: Text('something error occur'));
+              }
+              ;
+
+              return FeedList(feeds);
+            }));
   }
 }
