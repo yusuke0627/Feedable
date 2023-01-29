@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> loadFeeds() async {
     await Feed.getFeeds().then((value) async {
       debugPrint("CALL: loadFeeds()");
-      feeds = value;
+      feeds = value.take(50).toList();
       // save feeds to SharedPreferences.
       Feed.saveFeeds(feeds);
     });
