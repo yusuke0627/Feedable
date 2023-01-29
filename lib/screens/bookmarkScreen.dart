@@ -18,7 +18,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   }
 
   void loadFeeds() async {
-    await Feed.loadFromSharedPreferences().then((value) => setState(() {
+    await Feed.selectAll().then((value) => setState(() {
           feeds = value;
         }));
   }

@@ -18,22 +18,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> loadFeeds() async {
     await Feed.getFeeds().then((value) async {
-      debugPrint("CALL: loadFeeds()");
+      Feed.insertFeeds(value);
       feeds = value.take(50).toList();
-      // save feeds to SharedPreferences.
       Feed.saveFeeds(feeds);
     });
   }
 
   Future<void> refreshFeeds() async {
     await Feed.getFeeds().then((value) async {
-      debugPrint("CALL: loadFeeds()");
       // new feed found.
       if (value.first.url != feeds.first.url) {
-        debugPrint("New feed found");
         setState(() {
           feeds = value;
-          // save feeds to SharedPreferences.
           Feed.saveFeeds(feeds);
         });
       }
