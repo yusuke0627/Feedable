@@ -45,18 +45,20 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       onWillPop: () {
         return Future.value(false);
       },
-      child: Scaffold(
-          body: _screens[_selectedIndex],
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.bookmark), label: 'Bookmark'),
-            ],
-            type: BottomNavigationBarType.fixed,
-          )),
+      child: SafeArea(
+        child: Scaffold(
+            body: _screens[_selectedIndex],
+            bottomNavigationBar: BottomNavigationBar(
+              currentIndex: _selectedIndex,
+              onTap: _onItemTapped,
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.bookmark), label: 'Bookmark'),
+              ],
+              type: BottomNavigationBarType.fixed,
+            )),
+      ),
     );
   }
 }

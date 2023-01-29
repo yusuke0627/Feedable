@@ -50,8 +50,8 @@ class _FeedListState extends State<FeedList> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (BuildContext _context) =>
-                                    FeedView(url: widget.feeds[i].url)))
+                                builder: (BuildContext _context) => SafeArea(
+                                    child: FeedView(url: widget.feeds[i].url))))
                       },
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
