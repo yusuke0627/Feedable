@@ -14,9 +14,6 @@ class FeedList extends StatefulWidget {
 }
 
 class _FeedListState extends State<FeedList> {
-  _FeedListState() {
-    debugPrint("CALL: _FeedListState()");
-  }
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -31,10 +28,10 @@ class _FeedListState extends State<FeedList> {
                     setState(() {
                       if (widget.feeds[i].bookmarked) {
                         widget.feeds[i].bookmarked = false;
-                        Feed.saveFeeds(widget.feeds);
+                        widget.feeds[i].save();
                       } else {
                         widget.feeds[i].bookmarked = true;
-                        Feed.saveFeeds(widget.feeds);
+                        widget.feeds[i].save();
                       }
                     });
                   },

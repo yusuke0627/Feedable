@@ -1,8 +1,12 @@
 import 'dart:convert';
 
 import 'package:feedable/data/data.dart';
+import 'package:feedable/util/feeds_database.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:sqflite/sqflite.dart';
 import 'package:webfeed_plus/webfeed_plus.dart';
 
 enum FeedType {
@@ -41,12 +45,36 @@ class Feed {
     );
   }
 
+  Future<Feed> selectByUrl(url) async {
+    final Database db = await FeedableDatabase.database;
+    final List<Map<String, dynamic>> maps =
+        await db.query('feeds', where: 'url = ?', whereArgs: [url]);
+    return Feed(
+      title: maps[0]['title'],
+      url: maps[0]['url'],
+      publishedDate: DateTime.parse(maps[0]['publishedDate']),
+      blogName: maps[0]['blogName'],
+      bookmarked: maps[0]['bookmarked'] == '1' ? true : false,
+    );
+  }
+
+  Future<void> save() async {
+    final Database db = await FeedableDatabase.database;
+    await db.update(
+      'feeds',
+      toMap(this),
+      where: "url = ?",
+      whereArgs: [url.toString()],
+      conflictAlgorithm: ConflictAlgorithm.fail,
+    );
+  }
+
   static Map<String, dynamic> toMap(Feed feed) => {
         'title': feed.title,
         'url': feed.url,
         'publishedDate': feed.publishedDate.toString(),
         'blogName': feed.blogName,
-        'bookmarked': feed.bookmarked,
+        'bookmarked': (feed.bookmarked) ? '1' : '0',
       };
 
   static String encode(List<Feed> feeds) => json.encode(
@@ -58,37 +86,51 @@ class Feed {
           .map<Feed>((item) => Feed.fromJson(item))
           .toList();
 
+  static Future<void> insertFeeds(List<Feed> feeds) async {
+    feeds.forEach((feeds) {
+      insertFeed(feeds);
+    });
+  }
+
+  static Future<void> insertFeed(Feed feed) async {
+    final Database db = await FeedableDatabase.database;
+    await db.insert(
+      'feeds',
+      toMap(feed),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
   static Future<void> saveFeeds(List<Feed> feeds) async {
     final prefs = await SharedPreferences.getInstance();
     // update SharedPreferences.
     prefs.setString("feeds", Feed.encode(feeds));
   }
 
-  static Future<List<Feed>> loadFromSharedPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey("feeds")) {
-      String feedsString = prefs.getString("feeds")!;
-      if (feedsString.isNotEmpty) {
-        return Feed.decode(feedsString);
-      } else {
-        return [];
-      }
-    } else {
-      return [];
-    }
+  static Future<List<Feed>> selectAll() async {
+    final Database db = await FeedableDatabase.database;
+    final List<Map<String, dynamic>> maps = await db.query('feeds');
+    return List.generate(maps.length, (i) {
+      return Feed(
+        title: maps[i]['title'],
+        url: maps[i]['url'],
+        publishedDate: DateTime.parse(maps[i]['publishedDate']),
+        blogName: maps[i]['blogName'],
+        bookmarked: maps[i]['bookmarked'] == '1' ? true : false,
+      );
+    });
   }
 
   static Future<List<Feed>> getFeeds() async {
-    List<Feed> currentFeeds = await Feed.loadFromSharedPreferences();
-    // merge new feeds to localstorage feeds.
-    return await Feed.getNewFeedFromSite() + currentFeeds;
+    // merge new feeds and stored feeds.
+    return await Feed.getNewFeedFromSite() + await Feed.selectAll();
   }
 
   static Future<List<Feed>> getNewFeedFromSite() async {
     List<Feed> localFeeds = [];
     List<Feed> feedsFromSite = [];
     List<Feed> newFeeds = [];
-    localFeeds = await Feed.loadFromSharedPreferences();
+    localFeeds = await Feed.selectAll();
     feedsFromSite = await Feed.getFeedFromSite();
     newFeeds = feedsFromSite.where((a) => !localFeeds.contains(a)).toList();
 
