@@ -20,12 +20,14 @@ class Feed {
   final DateTime? publishedDate;
   final String blogName;
   bool bookmarked = false;
+  bool alreadyRead = false;
   Feed(
       {required this.title,
       required this.url,
       required this.publishedDate,
       required this.blogName,
-      this.bookmarked = false});
+      this.bookmarked = false,
+      this.alreadyRead = false});
 
   @override
   bool operator ==(Object other) {
@@ -42,6 +44,7 @@ class Feed {
       publishedDate: DateTime.parse(jsonData['publishedDate']),
       blogName: jsonData['blogName'],
       bookmarked: jsonData['bookmarked'],
+      alreadyRead: jsonData['alreadyRead'],
     );
   }
 
@@ -55,6 +58,7 @@ class Feed {
       publishedDate: DateTime.parse(maps[0]['publishedDate']),
       blogName: maps[0]['blogName'],
       bookmarked: maps[0]['bookmarked'] == '1' ? true : false,
+      alreadyRead: maps[0]['alreadyRead'] == '1' ? true : false,
     );
   }
 
@@ -75,6 +79,7 @@ class Feed {
         'publishedDate': feed.publishedDate.toString(),
         'blogName': feed.blogName,
         'bookmarked': (feed.bookmarked) ? '1' : '0',
+        'alreadyRead': (feed.alreadyRead) ? '1' : '0',
       };
 
   static String encode(List<Feed> feeds) => json.encode(
@@ -117,6 +122,7 @@ class Feed {
         publishedDate: DateTime.parse(maps[i]['publishedDate']),
         blogName: maps[i]['blogName'],
         bookmarked: maps[i]['bookmarked'] == '1' ? true : false,
+        alreadyRead: maps[i]['alreadyRead'] == '1' ? true : false,
       );
     });
   }

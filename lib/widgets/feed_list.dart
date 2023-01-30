@@ -46,13 +46,22 @@ class _FeedListState extends State<FeedList> {
             child: Container(
               padding: EdgeInsets.only(top: 5, bottom: 5),
               child: ListTile(
-                  onTap: () => {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (BuildContext _context) => SafeArea(
-                                    child: FeedView(url: widget.feeds[i].url))))
-                      },
+                  onTap: () {
+                    setState(() {
+                      if (widget.feeds[i].bookmarked) {
+                        widget.feeds[i].alreadyRead = false;
+                        widget.feeds[i].save();
+                      } else {
+                        widget.feeds[i].alreadyRead = true;
+                        widget.feeds[i].save();
+                      }
+                    });
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext _context) => SafeArea(
+                                child: FeedView(url: widget.feeds[i].url))));
+                  },
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -60,7 +69,11 @@ class _FeedListState extends State<FeedList> {
                           height: 40.0,
                           child: Text(
                             widget.feeds[i].title,
-                            style: TextStyle(fontSize: 14),
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: widget.feeds[i].alreadyRead
+                                    ? Colors.grey
+                                    : Colors.black),
                           )),
                       Container(
                           height: 20.0,
@@ -84,14 +97,22 @@ class _FeedListState extends State<FeedList> {
                                               Icon(Icons.bookmark_add_outlined))
                                     ])),
                               Text(widget.feeds[i].blogName,
-                                  style: TextStyle(fontSize: 10.0)),
+                                  style: TextStyle(
+                                      fontSize: 10.0,
+                                      color: widget.feeds[i].alreadyRead
+                                          ? Colors.grey
+                                          : Colors.black)),
                               SizedBox(
                                 width: 10.0,
                               ),
                               Text(
                                 new DateFormat('yyyy/MM/dd(E) HH:mm')
                                     .format(widget.feeds[i].publishedDate!),
-                                style: TextStyle(fontSize: 10.0),
+                                style: TextStyle(
+                                    fontSize: 10.0,
+                                    color: widget.feeds[i].alreadyRead
+                                        ? Colors.grey
+                                        : Colors.black),
                               )
                             ],
                           )),
