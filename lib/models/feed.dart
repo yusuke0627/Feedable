@@ -4,30 +4,22 @@ import 'package:feedable/data/data.dart';
 import 'package:feedable/util/feeds_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:sqflite/sqflite.dart';
 import 'package:webfeed_plus/webfeed_plus.dart';
+
+import 'package:freezed_annotation/freezed_annotation.dart';
+part 'feed.freezed.dart';
 
 enum FeedType {
   rss,
   atom,
 }
 
-class Feed {
-  final String title;
-  final String url;
-  final DateTime? publishedDate;
-  final String blogName;
-  bool bookmarked = false;
-  bool alreadyRead = false;
-  Feed(
-      {required this.title,
-      required this.url,
-      required this.publishedDate,
-      required this.blogName,
-      this.bookmarked = false,
-      this.alreadyRead = false});
+@freezed
+class Feed with _$Feed {
+  const factory Feed(String title, String url, DateTime publishedDate,
+      String blogName, bool bookmarked, bool alreadyRead) = _Feed;
 
   @override
   bool operator ==(Object other) {
@@ -37,38 +29,28 @@ class Feed {
     return false;
   }
 
-  factory Feed.fromJson(Map<String, dynamic> jsonData) {
-    return Feed(
-      title: jsonData['title'],
-      url: jsonData['url'],
-      publishedDate: DateTime.parse(jsonData['publishedDate']),
-      blogName: jsonData['blogName'],
-      bookmarked: jsonData['bookmarked'],
-      alreadyRead: jsonData['alreadyRead'],
-    );
-  }
-
-  Future<Feed> selectByUrl(url) async {
+  static Future<Feed> selectByUrl(url) async {
     final Database db = await FeedableDatabase.database;
-    final List<Map<String, dynamic>> maps =
-        await db.query('feeds', where: 'url = ?', whereArgs: [url]);
+    final List<Map<String, dynamic>> maps = await db.transaction(
+        (txn) => txn.query('feeds', where: 'url = ?', whereArgs: [url]));
+
     return Feed(
-      title: maps[0]['title'],
-      url: maps[0]['url'],
-      publishedDate: DateTime.parse(maps[0]['publishedDate']),
-      blogName: maps[0]['blogName'],
-      bookmarked: maps[0]['bookmarked'] == '1' ? true : false,
-      alreadyRead: maps[0]['alreadyRead'] == '1' ? true : false,
+      maps[0]['title'],
+      maps[0]['url'],
+      DateTime.parse(maps[0]['publishedDate']),
+      maps[0]['blogName'],
+      maps[0]['bookmarked'] == '1' ? true : false,
+      maps[0]['alreadyRead'] == '1' ? true : false,
     );
   }
 
-  Future<void> save() async {
+  static Future<void> save(Feed feed) async {
     final Database db = await FeedableDatabase.database;
     await db.update(
       'feeds',
-      toMap(this),
+      toMap(feed),
       where: "url = ?",
-      whereArgs: [url.toString()],
+      whereArgs: [feed.url],
       conflictAlgorithm: ConflictAlgorithm.fail,
     );
   }
@@ -81,15 +63,6 @@ class Feed {
         'bookmarked': (feed.bookmarked) ? '1' : '0',
         'alreadyRead': (feed.alreadyRead) ? '1' : '0',
       };
-
-  static String encode(List<Feed> feeds) => json.encode(
-        feeds.map<Map<String, dynamic>>((feed) => Feed.toMap(feed)).toList(),
-      );
-
-  static List<Feed> decode(String feeds) =>
-      (json.decode(feeds) as List<dynamic>)
-          .map<Feed>((item) => Feed.fromJson(item))
-          .toList();
 
   static Future<void> insertFeeds(List<Feed> feeds) async {
     feeds.forEach((feeds) {
@@ -106,23 +79,17 @@ class Feed {
     );
   }
 
-  static Future<void> saveFeeds(List<Feed> feeds) async {
-    final prefs = await SharedPreferences.getInstance();
-    // update SharedPreferences.
-    prefs.setString("feeds", Feed.encode(feeds));
-  }
-
   static Future<List<Feed>> selectAll() async {
     final Database db = await FeedableDatabase.database;
     final List<Map<String, dynamic>> maps = await db.query('feeds');
     return List.generate(maps.length, (i) {
       return Feed(
-        title: maps[i]['title'],
-        url: maps[i]['url'],
-        publishedDate: DateTime.parse(maps[i]['publishedDate']),
-        blogName: maps[i]['blogName'],
-        bookmarked: maps[i]['bookmarked'] == '1' ? true : false,
-        alreadyRead: maps[i]['alreadyRead'] == '1' ? true : false,
+        maps[i]['title'],
+        maps[i]['url'],
+        DateTime.parse(maps[i]['publishedDate']),
+        maps[i]['blogName'],
+        maps[i]['bookmarked'] == '1' ? true : false,
+        maps[i]['alreadyRead'] == '1' ? true : false,
       );
     });
   }
@@ -138,8 +105,17 @@ class Feed {
     List<Feed> newFeeds = [];
     localFeeds = await Feed.selectAll();
     feedsFromSite = await Feed.getFeedFromSite();
-    newFeeds = feedsFromSite.where((a) => !localFeeds.contains(a)).toList();
-
+    newFeeds = feedsFromSite.where((site) {
+      var hasSameFeed = false;
+      for (final local in localFeeds) {
+        if (local.url == site.url) {
+          hasSameFeed = true;
+          break;
+        }
+      }
+      return !hasSameFeed;
+    }).toList();
+    feedsFromSite;
     return newFeeds;
   }
 
@@ -177,10 +153,12 @@ class Feed {
       final blogs = rssItemlist
           .map(
             (item) => Feed(
-              url: item.link ?? '',
-              title: item.title ?? '',
-              publishedDate: item.dc!.date!,
-              blogName: rssFeed.title ?? '',
+              item.title ?? '',
+              item.link ?? '',
+              item.dc!.date!,
+              rssFeed.title ?? '',
+              false,
+              false,
             ),
           )
           .toList();
@@ -191,11 +169,12 @@ class Feed {
       final blogs = atomItemlist
           .map(
             (item) => Feed(
-              url: item.links?.first.href ?? '',
-              title: item.title ?? '',
-              publishedDate: item.updated ?? DateTime.now(),
-              blogName: atomFeed.title ?? '',
-            ),
+                item.title ?? '',
+                item.links?.first.href ?? '',
+                item.updated ?? DateTime.now(),
+                atomFeed.title ?? '',
+                false,
+                false),
           )
           .toList();
       return blogs;

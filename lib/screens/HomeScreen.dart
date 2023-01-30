@@ -20,7 +20,6 @@ class _HomeScreenState extends State<HomeScreen> {
     await Feed.getFeeds().then((value) async {
       Feed.insertFeeds(value);
       feeds = value.take(50).toList();
-      Feed.saveFeeds(feeds);
     });
   }
 
@@ -30,7 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
       if (value.first.url != feeds.first.url) {
         setState(() {
           feeds = value;
-          Feed.saveFeeds(feeds);
         });
       }
     });
