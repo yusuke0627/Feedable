@@ -16,6 +16,7 @@ class FeedList extends StatefulWidget {
 class _FeedListState extends State<FeedList> {
   @override
   Widget build(BuildContext context) {
+    debugPrint("Called: FeedList.build");
     return ListView.builder(
         itemCount: widget.feeds.length,
         itemBuilder: (context, i) => Slidable(
@@ -27,11 +28,13 @@ class _FeedListState extends State<FeedList> {
                   onPressed: (_) {
                     setState(() {
                       if (widget.feeds[i].bookmarked) {
-                        widget.feeds[i].bookmarked = false;
-                        widget.feeds[i].save();
+                        widget.feeds[i] =
+                            widget.feeds[i].copyWith(bookmarked: false);
+                        Feed.save(widget.feeds[i]);
                       } else {
-                        widget.feeds[i].bookmarked = true;
-                        widget.feeds[i].save();
+                        widget.feeds[i] =
+                            widget.feeds[i].copyWith(bookmarked: true);
+                        Feed.save(widget.feeds[i]);
                       }
                     });
                   },
@@ -48,13 +51,9 @@ class _FeedListState extends State<FeedList> {
               child: ListTile(
                   onTap: () {
                     setState(() {
-                      if (widget.feeds[i].bookmarked) {
-                        widget.feeds[i].alreadyRead = false;
-                        widget.feeds[i].save();
-                      } else {
-                        widget.feeds[i].alreadyRead = true;
-                        widget.feeds[i].save();
-                      }
+                      widget.feeds[i] =
+                          widget.feeds[i].copyWith(alreadyRead: true);
+                      Feed.save(widget.feeds[i]);
                     });
                     Navigator.push(
                         context,

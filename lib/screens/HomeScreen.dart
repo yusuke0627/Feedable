@@ -1,62 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/feed.dart';
 import '../widgets/feed_list.dart';
+import '../notifiers/feeds_notifier.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  List<Feed> feeds = [];
-
-  _HomeScreenState() {
-    loadFeeds();
-  }
-
-  Future<void> loadFeeds() async {
-    await Feed.getFeeds().then((value) async {
-      Feed.insertFeeds(value);
-      feeds = value.take(50).toList();
-      Feed.saveFeeds(feeds);
-    });
+class HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
   }
 
   Future<void> refreshFeeds() async {
-    await Feed.getFeeds().then((value) async {
-      // new feed found.
-      if (value.first.url != feeds.first.url) {
-        setState(() {
-          feeds = value;
-          Feed.saveFeeds(feeds);
-        });
-      }
-    });
+    var feedsNotifier = ref.read(feedsNotifierProvider.notifier);
+    ref.refresh(feedsFutureProvider);
   }
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("Called HomeScreenState.build");
     return Scaffold(
         appBar: AppBar(title: Text('Feedable')),
-        body: FutureBuilder(
-            future: loadFeeds(),
-            builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-
-              if (snapshot.error != null) {
-                // TODO care error.
-                return Center(child: Text('something error occur'));
-              }
-              ;
-
+        body: ref.watch(feedsFutureProvider).when(
+            data: ((feeds) {
               return RefreshIndicator(
-                  onRefresh: refreshFeeds, child: FeedList(feeds));
-            }));
+                  onRefresh: (() {
+                    return refreshFeeds();
+                  }),
+                  child: FeedList(feeds.take(50).toList()));
+            }),
+            loading: () => Center(child: const CircularProgressIndicator()),
+            error: (error, _) => Text(error.toString())));
   }
 }
