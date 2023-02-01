@@ -18,20 +18,13 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> refreshFeeds() async {
-    debugPrint("Called refreshFeeds");
     var feedsNotifier = ref.read(feedsNotifierProvider.notifier);
-
     ref.refresh(feedsFutureProvider);
-    await Feed.getFeedFromSite().then((site) {
-      feedsNotifier.addFeeds(site);
-      Feed.insertFeeds(site);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     debugPrint("Called HomeScreenState.build");
-
     return Scaffold(
         appBar: AppBar(title: Text('Feedable')),
         body: ref.watch(feedsFutureProvider).when(
