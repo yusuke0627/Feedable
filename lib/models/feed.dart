@@ -95,8 +95,13 @@ class Feed with _$Feed {
   }
 
   static Future<List<Feed>> getFeeds() async {
+    List<Feed> newFeeds = await Feed.getNewFeedFromSite();
+    List<Feed> localFeeds = await Feed.selectAll();
+    List<Feed> feeds = [...newFeeds, ...localFeeds];
+    feeds.sort((a, b) => b.publishedDate!.compareTo(a.publishedDate!));
+
     // merge new feeds and stored feeds.
-    return await Feed.getNewFeedFromSite() + await Feed.selectAll();
+    return feeds;
   }
 
   static Future<List<Feed>> getNewFeedFromSite() async {
@@ -115,7 +120,6 @@ class Feed with _$Feed {
       }
       return !hasSameFeed;
     }).toList();
-    feedsFromSite;
     return newFeeds;
   }
 
@@ -137,7 +141,6 @@ class Feed with _$Feed {
     });
 
     List<Feed> feeds = feedsEachSite.expand((element) => element).toList();
-    feeds.sort((a, b) => b.publishedDate!.compareTo(a.publishedDate!));
 
     return feeds;
   }

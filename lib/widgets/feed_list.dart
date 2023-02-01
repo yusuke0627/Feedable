@@ -16,6 +16,7 @@ class FeedList extends StatefulWidget {
 class _FeedListState extends State<FeedList> {
   @override
   Widget build(BuildContext context) {
+    debugPrint("Called: FeedList.build");
     return ListView.builder(
         itemCount: widget.feeds.length,
         itemBuilder: (context, i) => Slidable(
