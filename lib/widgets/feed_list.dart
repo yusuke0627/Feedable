@@ -1,24 +1,40 @@
+import 'package:feedable/screens/bookmarkScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 
 import '../models/feed.dart';
+import '../notifiers/feeds_notifier.dart';
 import '../screens/feedView.dart';
 
-class FeedList extends StatefulWidget {
-  List<Feed> feeds;
-  FeedList(this.feeds);
+class FeedList extends ConsumerStatefulWidget {
+  bool bookmarkList;
+  FeedList(this.bookmarkList);
 
   @override
-  State<FeedList> createState() => _FeedListState();
+  ConsumerState createState() => FeedListState();
 }
 
-class _FeedListState extends State<FeedList> {
+class FeedListState extends ConsumerState<FeedList> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    List<Feed> feeds;
+    if (widget.bookmarkList) {
+      feeds = ref.watch(feedsNotifierProvider.notifier).bookmarkedFeed();
+    } else {
+      feeds = ref.watch(feedsNotifierProvider);
+    }
+    // feeds = widget.feeds;
+
     debugPrint("Called: FeedList.build");
     return ListView.builder(
-        itemCount: widget.feeds.length,
+        itemCount: feeds.length,
         itemBuilder: (context, i) => Slidable(
             key: UniqueKey(),
             startActionPane: ActionPane(
@@ -26,19 +42,12 @@ class _FeedListState extends State<FeedList> {
               children: [
                 SlidableAction(
                   onPressed: (_) {
-                    setState(() {
-                      if (widget.feeds[i].bookmarked) {
-                        widget.feeds[i] =
-                            widget.feeds[i].copyWith(bookmarked: false);
-                        Feed.save(widget.feeds[i]);
-                      } else {
-                        widget.feeds[i] =
-                            widget.feeds[i].copyWith(bookmarked: true);
-                        Feed.save(widget.feeds[i]);
-                      }
-                    });
+                    ref
+                        .read(feedsNotifierProvider.notifier)
+                        .toggleBookmark(feeds[i].url);
+                    Feed.save(ref.read(feedsNotifierProvider)[i]);
                   },
-                  backgroundColor: widget.feeds[i].bookmarked
+                  backgroundColor: feeds[i].bookmarked
                       ? Colors.grey
                       : Theme.of(context).primaryColor,
                   icon: Icons.bookmark,
@@ -50,16 +59,21 @@ class _FeedListState extends State<FeedList> {
               padding: EdgeInsets.only(top: 5, bottom: 5),
               child: ListTile(
                   onTap: () {
-                    setState(() {
-                      widget.feeds[i] =
-                          widget.feeds[i].copyWith(alreadyRead: true);
-                      Feed.save(widget.feeds[i]);
-                    });
+                    if (!feeds[i].alreadyRead) {
+                      ref
+                          .read(feedsNotifierProvider.notifier)
+                          .toggleAlreadyRead(feeds[i].url);
+                      Feed.save(ref.read(feedsNotifierProvider)[i]);
+                    }
+
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (BuildContext _context) => SafeArea(
-                                child: FeedView(url: widget.feeds[i].url))));
+                                child: FeedView(
+                                    url: ref
+                                        .read(feedsNotifierProvider)[i]
+                                        .url))));
                   },
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,10 +81,10 @@ class _FeedListState extends State<FeedList> {
                       Container(
                           height: 40.0,
                           child: Text(
-                            widget.feeds[i].title,
+                            feeds[i].title,
                             style: TextStyle(
                                 fontSize: 14,
-                                color: widget.feeds[i].alreadyRead
+                                color: feeds[i].alreadyRead
                                     ? Colors.grey
                                     : Colors.black),
                           )),
@@ -79,7 +93,7 @@ class _FeedListState extends State<FeedList> {
                           alignment: Alignment.bottomLeft,
                           child: Row(
                             children: [
-                              widget.feeds[i].bookmarked
+                              feeds[i].bookmarked
                                   ? RichText(
                                       text: TextSpan(children: [
                                       WidgetSpan(
@@ -95,10 +109,10 @@ class _FeedListState extends State<FeedList> {
                                           child:
                                               Icon(Icons.bookmark_add_outlined))
                                     ])),
-                              Text(widget.feeds[i].blogName,
+                              Text(feeds[i].blogName,
                                   style: TextStyle(
                                       fontSize: 10.0,
-                                      color: widget.feeds[i].alreadyRead
+                                      color: feeds[i].alreadyRead
                                           ? Colors.grey
                                           : Colors.black)),
                               SizedBox(
@@ -106,10 +120,10 @@ class _FeedListState extends State<FeedList> {
                               ),
                               Text(
                                 new DateFormat('yyyy/MM/dd(E) HH:mm')
-                                    .format(widget.feeds[i].publishedDate!),
+                                    .format(feeds[i].publishedDate!),
                                 style: TextStyle(
                                     fontSize: 10.0,
-                                    color: widget.feeds[i].alreadyRead
+                                    color: feeds[i].alreadyRead
                                         ? Colors.grey
                                         : Colors.black),
                               )

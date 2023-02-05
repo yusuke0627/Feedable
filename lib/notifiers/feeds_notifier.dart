@@ -5,6 +5,10 @@ import '../models/feed.dart';
 class FeedsNotifier extends StateNotifier<List<Feed>> {
   FeedsNotifier() : super([]);
 
+  List<Feed> bookmarkedFeed() {
+    return state.where((feed) => feed.bookmarked).toList();
+  }
+
   void addFeeds(List<Feed> feeds) {
     // add unique feeds.
     List<Feed> newFeeds = feeds.where((site) {
@@ -28,6 +32,26 @@ class FeedsNotifier extends StateNotifier<List<Feed>> {
     state = [
       for (final feed in state)
         if (feed.url != url) feed,
+    ];
+  }
+
+  void toggleBookmark(String url) {
+    state = [
+      for (final feed in state)
+        if (feed.url == url)
+          feed.copyWith(bookmarked: !feed.bookmarked)
+        else
+          feed,
+    ];
+  }
+
+  void toggleAlreadyRead(String url) {
+    state = [
+      for (final feed in state)
+        if (feed.url == url)
+          feed.copyWith(alreadyRead: !feed.alreadyRead)
+        else
+          feed,
     ];
   }
 

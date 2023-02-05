@@ -33,7 +33,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                   onRefresh: (() {
                     return refreshFeeds();
                   }),
-                  child: FeedList(feeds.take(50).toList()));
+                  child: FeedList(false));
             }),
             loading: () => Center(child: const CircularProgressIndicator()),
             error: (error, _) => Text(error.toString())));
