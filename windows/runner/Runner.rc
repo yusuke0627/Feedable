@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "feedable" "\0"
+            VALUE "FileDescription", "zunda_reader" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "feedable" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "feedable.exe" "\0"
-            VALUE "ProductName", "feedable" "\0"
+            VALUE "InternalName", "zunda_reader" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
+            VALUE "OriginalFilename", "zunda_reader.exe" "\0"
+            VALUE "ProductName", "zunda_reader" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

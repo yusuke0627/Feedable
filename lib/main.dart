@@ -1,12 +1,14 @@
-import 'package:feedable/screens/HomeScreen.dart';
-import 'package:feedable/screens/bookmarkScreen.dart';
-import 'package:feedable/notifiers/feeds_notifier.dart';
+import 'package:zunda_reader/screens/HomeScreen.dart';
+// import 'package:zu';
+
+import 'package:zunda_reader/screens/bookmarkScreen.dart';
+import 'package:zunda_reader/notifiers/feeds_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(ProviderScope(child: const MyApp()));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyStatefulWidget(),
+      home: const MyStatefulWidget(),
     );
   }
 }

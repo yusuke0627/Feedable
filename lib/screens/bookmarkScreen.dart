@@ -26,7 +26,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('Feedable')),
+        appBar: AppBar(title: const Text('Feedable')),
         body: FeedList(feeds.where((element) => element.bookmarked).toList()));
   }
 }

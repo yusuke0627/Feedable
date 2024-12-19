@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:feedable/data/data.dart';
-import 'package:feedable/util/feeds_database.dart';
+import 'package:zunda_reader/data/data.dart';
+import 'package:zunda_reader/util/feeds_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 import 'package:http/http.dart' as http;
@@ -65,9 +65,9 @@ class Feed with _$Feed {
       };
 
   static Future<void> insertFeeds(List<Feed> feeds) async {
-    feeds.forEach((feeds) {
+    for (var feeds in feeds) {
       insertFeed(feeds);
-    });
+    }
   }
 
   static Future<void> insertFeed(Feed feed) async {
@@ -98,7 +98,7 @@ class Feed with _$Feed {
     List<Feed> newFeeds = await Feed.getNewFeedFromSite();
     List<Feed> localFeeds = await Feed.selectAll();
     List<Feed> feeds = [...newFeeds, ...localFeeds];
-    feeds.sort((a, b) => b.publishedDate!.compareTo(a.publishedDate!));
+    feeds.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
 
     // merge new feeds and stored feeds.
     return feeds;
