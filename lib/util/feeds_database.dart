@@ -9,7 +9,7 @@ class FeedableDatabase {
     // await deleteDatabase(
     //     join(await getDatabasesPath(), 'feedable_database.db')); // Delete
 
-    final Future<Database> _database = openDatabase(
+    final Future<Database> database = openDatabase(
       join(await getDatabasesPath(), 'feedable_database.db'),
       onCreate: (db, version) {
         return db.execute(
@@ -17,7 +17,7 @@ class FeedableDatabase {
       },
       version: 1,
     );
-    cache = _database;
-    return _database;
+    cache = database;
+    return database;
   }
 }

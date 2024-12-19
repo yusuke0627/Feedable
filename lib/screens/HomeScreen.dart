@@ -26,7 +26,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     debugPrint("Called HomeScreenState.build");
     return Scaffold(
-        appBar: AppBar(title: Text('Feedable')),
+        appBar: AppBar(title: const Text('Feedable')),
         body: ref.watch(feedsFutureProvider).when(
             data: ((feeds) {
               return RefreshIndicator(
@@ -35,7 +35,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                   }),
                   child: FeedList(feeds.take(50).toList()));
             }),
-            loading: () => Center(child: const CircularProgressIndicator()),
+            loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, _) => Text(error.toString())));
   }
 }

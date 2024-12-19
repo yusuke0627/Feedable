@@ -7,7 +7,7 @@ import '../screens/feedView.dart';
 
 class FeedList extends StatefulWidget {
   List<Feed> feeds;
-  FeedList(this.feeds);
+  FeedList(this.feeds, {super.key});
 
   @override
   State<FeedList> createState() => _FeedListState();
@@ -47,7 +47,7 @@ class _FeedListState extends State<FeedList> {
               ],
             ),
             child: Container(
-              padding: EdgeInsets.only(top: 5, bottom: 5),
+              padding: const EdgeInsets.only(top: 5, bottom: 5),
               child: ListTile(
                   onTap: () {
                     setState(() {
@@ -58,13 +58,13 @@ class _FeedListState extends State<FeedList> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (BuildContext _context) => SafeArea(
+                            builder: (BuildContext context) => SafeArea(
                                 child: FeedView(url: widget.feeds[i].url))));
                   },
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
+                      SizedBox(
                           height: 40.0,
                           child: Text(
                             widget.feeds[i].title,
@@ -90,7 +90,7 @@ class _FeedListState extends State<FeedList> {
                                       ),
                                     ]))
                                   : RichText(
-                                      text: TextSpan(children: [
+                                      text: const TextSpan(children: [
                                       WidgetSpan(
                                           child:
                                               Icon(Icons.bookmark_add_outlined))
@@ -101,12 +101,12 @@ class _FeedListState extends State<FeedList> {
                                       color: widget.feeds[i].alreadyRead
                                           ? Colors.grey
                                           : Colors.black)),
-                              SizedBox(
+                              const SizedBox(
                                 width: 10.0,
                               ),
                               Text(
-                                new DateFormat('yyyy/MM/dd(E) HH:mm')
-                                    .format(widget.feeds[i].publishedDate!),
+                                DateFormat('yyyy/MM/dd(E) HH:mm')
+                                    .format(widget.feeds[i].publishedDate),
                                 style: TextStyle(
                                     fontSize: 10.0,
                                     color: widget.feeds[i].alreadyRead

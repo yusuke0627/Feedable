@@ -1,6 +1,6 @@
 {
-    "name": "feedable",
-    "short_name": "feedable",
+    "name": "zunda_reader",
+    "short_name": "zunda_reader",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

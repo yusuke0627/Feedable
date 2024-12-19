@@ -1,8 +1,4 @@
-import 'package:http/http.dart' as http;
-import 'package:webfeed_plus/webfeed_plus.dart';
-import 'package:feedable/models/feed.dart';
 
-import '../data/data.dart';
 
 // enum FeedType {
 //   rss,
