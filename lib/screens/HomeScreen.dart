@@ -18,7 +18,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> refreshFeeds() async {
-    var feedsNotifier = ref.read(feedsNotifierProvider.notifier);
+    ref.read(feedsNotifierProvider.notifier);
     ref.refresh(feedsFutureProvider);
   }
 
