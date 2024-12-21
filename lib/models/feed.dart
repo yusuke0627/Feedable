@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:zunda_reader/data/data.dart';
 import 'package:zunda_reader/util/feeds_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 import 'package:http/http.dart' as http;
 import 'package:sqflite/sqflite.dart';
@@ -28,6 +27,9 @@ class Feed with _$Feed {
     }
     return false;
   }
+
+  @override
+  int get hashCode => url.hashCode;
 
   static Future<Feed> selectByUrl(url) async {
     final Database db = await FeedableDatabase.database;
@@ -65,8 +67,9 @@ class Feed with _$Feed {
       };
 
   static Future<void> insertFeeds(List<Feed> feeds) async {
-    for (var feeds in feeds) {
-      insertFeed(feeds);
+    // ToDo bulk insert
+    for (var feed in feeds) {
+      insertFeed(feed);
     }
   }
 
@@ -75,7 +78,7 @@ class Feed with _$Feed {
     await db.insert(
       'feeds',
       toMap(feed),
-      conflictAlgorithm: ConflictAlgorithm.replace,
+      conflictAlgorithm: ConflictAlgorithm.ignore,
     );
   }
 
@@ -96,53 +99,36 @@ class Feed with _$Feed {
 
   static Future<List<Feed>> getFeeds() async {
     List<Feed> newFeeds = await Feed.getNewFeedFromSite();
-    List<Feed> localFeeds = await Feed.selectAll();
-    List<Feed> feeds = [...newFeeds, ...localFeeds];
-    feeds.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
 
-    // merge new feeds and stored feeds.
+    // 永続化
+    Feed.insertFeeds(newFeeds);
+    return await Feed.selectAll();
+  }
+
+  static Future<List<Feed>> getFeedsOrderedByDate() async {
+    var feeds = await getFeeds();
+    // 副作用
+    feeds.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
     return feeds;
   }
 
   static Future<List<Feed>> getNewFeedFromSite() async {
-    List<Feed> localFeeds = [];
-    List<Feed> feedsFromSite = [];
-    List<Feed> newFeeds = [];
-    localFeeds = await Feed.selectAll();
-    feedsFromSite = await Feed.getFeedFromSite();
-    newFeeds = feedsFromSite.where((site) {
-      var hasSameFeed = false;
-      for (final local in localFeeds) {
-        if (local.url == site.url) {
-          hasSameFeed = true;
-          break;
-        }
-      }
-      return !hasSameFeed;
-    }).toList();
-    return newFeeds;
-  }
-
-  static Future<List<Feed>> getFeedFromSite() async {
     List<List<Feed>> feedsEachSite = [];
     await Future.forEach(Sites, (site) async {
-      FeedType? feedType;
       if (site["feedType"]! == "rss") {
-        feedType = FeedType.rss;
+        await _getFeedFromSite(site["url"]!, FeedType.rss).then((value) {
+          feedsEachSite.add(value);
+        });
       } else if (site["feedType"]! == "atom") {
-        feedType = FeedType.atom;
-        // Cannot reach this statement.
+        await _getFeedFromSite(site["url"]!, FeedType.atom).then((value) {
+          feedsEachSite.add(value);
+        });
       } else {
-        feedType = null;
+        // Cannot reach this statement.
       }
-      await _getFeedFromSite(site["url"]!, feedType!).then((value) {
-        feedsEachSite.add(value);
-      });
     });
 
-    List<Feed> feeds = feedsEachSite.expand((element) => element).toList();
-
-    return feeds;
+    return feedsEachSite.expand((element) => element).toList();
   }
 
   static Future<List<Feed>> _getFeedFromSite(String url, FeedType type) async {
@@ -152,8 +138,8 @@ class Feed with _$Feed {
     }
     if (type == FeedType.rss) {
       final rssFeed = RssFeed.parse(response.body);
-      final rssItemlist = rssFeed.items ?? <RssItem>[];
-      final blogs = rssItemlist
+      final rssItems = rssFeed.items ?? <RssItem>[];
+      final blogs = rssItems
           .map(
             (item) => Feed(
               item.title ?? '',
@@ -168,8 +154,8 @@ class Feed with _$Feed {
       return blogs;
     } else if (type == FeedType.atom) {
       final atomFeed = AtomFeed.parse(response.body);
-      final atomItemlist = atomFeed.items ?? <AtomItem>[];
-      final blogs = atomItemlist
+      final atomItems = atomFeed.items ?? <AtomItem>[];
+      final blogs = atomItems
           .map(
             (item) => Feed(
                 item.title ?? '',

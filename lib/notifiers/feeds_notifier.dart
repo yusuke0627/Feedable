@@ -31,7 +31,7 @@ class FeedsNotifier extends StateNotifier<List<Feed>> {
     ];
   }
 
-  Future<bool> HaveNewFeed() {
+  Future<bool> haveNewFeed() {
     return Feed.getNewFeedFromSite().then((value) {
       return value.isNotEmpty;
     });
@@ -45,12 +45,10 @@ final feedsNotifierProvider =
 
 final feedsFutureProvider = FutureProvider<List<Feed>>((ref) async {
   var feedsNotifier = ref.watch(feedsNotifierProvider.notifier);
-  return await Feed.getFeeds().then((value) async {
+  return await Feed.getFeedsOrderedByDate().then((value) async {
     // add to state
     feedsNotifier.addFeeds(value);
 
-    // add to sqlite3
-    Feed.insertFeeds(value);
     return value;
   });
 });
