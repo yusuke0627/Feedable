@@ -1,16 +1,12 @@
-# zunda_reader
+# ZundaReader
 
-A new Flutter project.
+Rss, Atom reader written by Flutter. Consider users with small hands or left-handed people✋ Less advertisements. Easy to use while eating snacks.😄
 
-## Getting Started
+手が小さい方、左利きのユーザを置き去りにしないRSSリーダーを目指しているのだ。
 
-This project is a starting point for a Flutter application.
+Feel free to create issues or submit pull requests anytime!
 
-A few resources to get you started if this is your first Flutter project:
+お気軽にissueやpullrequestをなげてほしいのだ。
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# License
+The source code is licensed MIT. The website content is licensed CC BY 4.0,see LICENSE.
